@@ -1,0 +1,94 @@
+node_types:
+  cloudify.kubernetes.Base:
+    derived_from: cloudify.nodes.Root
+    properties:
+      ssh_keyfilename:
+        description: file name that holds ssh key for passwordless operation
+        default: ''
+      ssh_username:
+        description: ssh user
+        default: ''
+      ssh_password:
+        description: ssh password when not using passwordless operation
+        default: ''
+      ssh_port:
+        description: ssh port.  defaults to 22
+        default: 22
+      install_docker:
+        description: install docker
+        default: false
+      install:
+        description: install kubernetes
+        default: true
+     
+      
+  ##########################################
+  # Represents a master/node
+  ##########################################
+  cloudify.kubernetes.Master:
+    derived_from: cloudify.kubernetes.Base
+    properties:
+      install_docker:
+        default: false
+      master_port:
+        default: 8080
+
+  ##########################################
+  # Represents a minion/node
+  ##########################################
+  cloudify.kubernetes.Node:
+    derived_from: cloudify.kubernetes.Base
+    
+  ##########################################
+  # Represents a kubernetes service
+  ##########################################
+  cloudify.kubernetes.Microservice:
+    derived_from: cloudify.nodes.Root
+    properties:
+      name:
+        description: the name of the service
+        default: ''
+      image:
+        description: the image to run
+        default: ''
+      port:
+        description: the port for the service
+        default: -1
+      target_port:
+        description: the target port to map
+        default: {get_property: [SELF,port]}
+      protocol:
+        description: the service protocol { TCP|UDP }  TCP default
+        default: TCP
+      replicas:
+        description: the number of instances to run
+        default: 1
+      run_overrides:
+        description: json overrides for kubectl run
+        default: ''
+      expose_overrides:
+        description: json overrides for kubectl expose
+        default: ''
+      config:
+        description: key/values in kubernetes format. if config_path also defined, merge these values with file contents
+        default: {}
+      config_path:
+        description: external kubernetes manifest for service
+        default: ''
+      config_overrides:
+        description: overrides in python format for config_path settings
+        default: ''
+
+
+relationships:
+  cloudify.kubernetes.relationships.connected_to_master:
+    derived_from: cloudify.relationships.connected_to
+
+  cloudify.kubernetes.relationships.contained_in_host:
+    derived_from: cloudify.relationships.contained_in
+
+  cloudify.kubernetes.relationships.copy_rtprops:
+    derived_from: cloudify.relationships.connected_to
+    properties:
+      prop_list:
+        default: ""
