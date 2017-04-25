@@ -158,8 +158,10 @@ These events are from Riemann itself, and we've put no filter to hide them.  Let
 
     index
 
-    (over 10
-     #(info "TRIGGER"  %)
+    (where (service "http req")
+      (over 10
+       #(info "TRIGGER"  %)
+      )
     )
   )
 )
